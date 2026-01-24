@@ -1,0 +1,94 @@
+{
+  "PI_ID": "jupizero2w1",
+  "PI_NAME_FRIENDLY": "Pi Zero Desk",
+  "inputs": {
+    "ju_room_plug_on": {
+      "nameFriendly": "Desk | Plug On",
+      "pin": "GPIO21",
+      "type": "binary_sensor"
+    },
+    "ju_room_plug_off": {
+      "nameFriendly": "Desk | Plug Off",
+      "pin": "GPIO18",
+      "type": "binary_sensor"
+    },
+    "ju_room_lights_on": {
+      "nameFriendly": "Desk | Lights On",
+      "pin": "GPIO25",
+      "type": "binary_sensor"
+    },
+    "ju_room_lights_off": {
+      "nameFriendly": "Desk | Lights Off",
+      "pin": "GPIO26",
+      "type": "binary_sensor"
+    },
+    "ju_room_screens_on": {
+      "nameFriendly": "Desk | Screens On",
+      "pin": "GPIO7",
+      "type": "binary_sensor"
+    },
+    "ju_room_screens_off": {
+      "nameFriendly": "Desk | Screens Off",
+      "pin": "GPIO8",
+      "type": "binary_sensor"
+    },
+    "ju_room_amp_on": {
+      "nameFriendly": "Desk | Amp On",
+      "pin": "GPIO20",
+      "type": "binary_sensor"
+    },
+    "ju_room_amp_off": {
+      "nameFriendly": "Desk | Amp Off",
+      "pin": "GPIO16",
+      "type": "binary_sensor"
+    },
+    "ju_room_master_on": {
+      "nameFriendly": "Desk | Master On",
+      "pin": "GPIO15",
+      "type": "binary_sensor"
+    },
+    "ju_room_master_off": {
+      "nameFriendly": "Desk | Master Off",
+      "pin": "GPIO13",
+      "type": "binary_sensor",
+      "invertLogic": true
+    }
+  },
+  "outputs": {
+    "ju_room_plug_weewoo": {
+      "nameFriendly": "Desk | Plug Weewoo",
+      "pin": "GPIO4",
+      "type": "switch"
+    },
+    "ju_room_lights": {
+      "nameFriendly": "Desk | Lights",
+      "pin": "GPIO27",
+      "type": "switch"
+    },
+    "ju_room_screens": {
+      "nameFriendly": "Desk | Screens",
+      "pin": "GPIO22",
+      "type": "switch"
+    },
+    "ju_room_amp": {
+      "nameFriendly": "Desk | Amp",
+      "pin": "GPIO5",
+      "type": "switch"
+    },
+    "ju_room_indicator_led": {
+      "nameFriendly": "Desk | Indicator LED",
+      "pin": "GPIO12",
+      "type": "switch"
+    },
+    "ju_room_pc_switch": {
+      "nameFriendly": "Desk | PC Switch",
+      "pin": "GPIO6",
+      "type": "switch"
+    },
+    "ju_room_plug": {
+      "nameFriendly": "Desk | Plug",
+      "pin": "GPIO17",
+      "type": "switch"
+    }
+  }
+}

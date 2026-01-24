@@ -1,0 +1,26 @@
+{
+  "name": "test",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MPL-2.0",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "fs": "^0.0.1-security",
+    "mqtt": "^5.14.1",
+    "oberknecht-rpio": "^0.1.6",
+    "oberknecht-utils": "^2.0.4",
+    "pm2": "^6.0.14",
+    "systeminformation": "^5.30.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.3",
+    "tsc": "^2.0.4",
+    "typescript": "^5.9.3"
+  }
+}

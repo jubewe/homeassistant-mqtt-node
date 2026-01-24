@@ -1,0 +1,13 @@
+{
+    "include": [
+        "./ts/"
+    ],
+    "compilerOptions": {
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "outDir": "./js",
+        "declaration": true,
+        "module": "NodeNext",
+        "target": "ESNext"
+    }
+}
