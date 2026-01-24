@@ -6,7 +6,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Jubewe",
+  "repository": {
+    "url": "https://github.com/jubewe/homeassistant-mqtt-node"
+  },
   "license": "MPL-2.0",
   "description": "",
   "dependencies": {

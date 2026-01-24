@@ -1,9 +1,11 @@
 import mqtt from "mqtt";
 import dotenv from "dotenv";
 import pm2 from "pm2";
-import { log, stackName } from "oberknecht-utils";
+import { filterByKeys, log, stackName } from "oberknecht-utils";
 import si from "systeminformation";
 import { exec } from "child_process";
+
+const { version, repository } = require("../package.json");
 
 const sn = stackName("HA-MQTT SystemMonitor")[0];
 
@@ -13,6 +15,7 @@ const {
   MQTT_PASS,
   HA_DISCOVERY,
   PI_ID,
+  PI_ID_SYSTEM: PI_ID_SYSTEM_ENV,
   PI_NAME_FRIENDLY,
   UPDATE_INTERVAL_MS,
   BASE_TOPIC_SYSTEM: BASE_TOPIC_ENV,
@@ -24,12 +27,17 @@ const {
 
 // ================= CONFIG =================
 
-const BASE_TOPIC = BASE_TOPIC_ENV ?? `pis/system/${PI_ID}`;
+const PI_ID_SYSTEM = PI_ID_SYSTEM_ENV ?? `${PI_ID}_system`;
+
+const BASE_TOPIC = BASE_TOPIC_ENV ?? `pis/${PI_ID_SYSTEM}`;
 const STATUS_TOPIC = STATUS_TOPIC_ENV ?? `${BASE_TOPIC}/status`;
 const PAYLOAD_STATUS_ON = PAYLOAD_STATUS_ON_ENV ?? "ON";
 const PAYLOAD_STATUS_OFF = PAYLOAD_STATUS_OFF_ENV ?? "OFF";
 
 const MONITOR_TOPIC = MONITOR_TOPIC_ENV ?? `${BASE_TOPIC}/monitor`;
+
+const COMMAND_TOPIC_UPDATE = `${BASE_TOPIC}/command/update`;
+const COMMAND_TOPIC_UPDATE_FIRMWARE = `${BASE_TOPIC}/command/update_firmware`;
 
 const UPDATE_INTERVAL = UPDATE_INTERVAL_MS
   ? parseInt(UPDATE_INTERVAL_MS)
@@ -41,6 +49,11 @@ const systemSensors = {
     device_class: "timestamp",
     value_template: "{{ value_json.info.timestamp }}",
     // json_attributes_template: "{{ value_json.info | tojson }}",
+  },
+  software_version: {
+    name: "Software Version",
+    value_template: "{{ value_json.info.softwareVersion }}",
+    icon: "mdi:application-edit",
   },
   uptime: {
     name: "System Start Time",
@@ -114,15 +127,15 @@ const systemSensors = {
   //   value_template: "{{ value_json.info.ipAddress }}",
   //   icon: "mdi:upload-network",
   // },
-  updates_available: {
+  system_updates_available: {
     name: "Updates Available",
-    value_template: "{{ value_json.info.updatesAvailable }}",
+    value_template: "{{ value_json.info.systemUpdatesAvailable }}",
     icon: "mdi:package-up",
   },
-  updates_last_check: {
+  system_updates_last_check: {
     name: "Updates Last Check",
     device_class: "timestamp",
-    value_template: "{{ value_json.info.updatesLastCheck }}",
+    value_template: "{{ value_json.info.systemUpdatesLastCheck }}",
     icon: "mdi:package-up",
   },
   pm2_active_process_count: {
@@ -150,8 +163,8 @@ const systemSensors = {
   },
 };
 
-let updatesLastCheck = -1;
-let updatesAvailable = -1;
+let systemUpdatesLastCheck = -1;
+let systemUpdatesAvailable = -1;
 
 // =========================================
 
@@ -191,6 +204,7 @@ async function sendSystemState() {
   let r = {
     info: {
       timestamp: new Date().toISOString(),
+      softwareVersion: version.toString(),
       startTime: new Date(
         parseInt((Date.now() - si.time().uptime * 1000).toFixed(0))
       ).toISOString(),
@@ -201,8 +215,12 @@ async function sendSystemState() {
       diskUse: -1,
       memoryUsed: -1,
       memoryUse: -1,
-      updatesAvailable: updatesAvailable,
-      updatesLastCheck: new Date(updatesLastCheck).toISOString(),
+      systemUpdatesAvailable:
+        systemUpdatesAvailable <= 0 ? undefined : systemUpdatesAvailable,
+      systemUpdatesLastCheck:
+        systemUpdatesLastCheck <= 0
+          ? undefined
+          : new Date(systemUpdatesLastCheck).toISOString(),
       networkRx: -1,
       networkTx: -1,
       // ipAddress: undefined
@@ -269,21 +287,25 @@ async function sendSystemState() {
   r.info.networkRx = siDataNetwork[0].rx_bytes / 1024 / 1024; // in MB
   r.info.networkTx = siDataNetwork[0].tx_bytes / 1024 / 1024; // in MB
 
-  if (updatesLastCheck < Date.now() - 6 * 60 * 60 * 1000) {
+  /*
+  if (systemUpdatesLastCheck < Date.now() - 6 * 60 * 60 * 1000) {
     log(0, sn, "Checking for system updates...");
     await checkForSystemUpdates()
       .then((updates: number) => {
         log(0, sn, "System updates available:", updates);
-        updatesLastCheck = Date.now();
-        updatesAvailable = updates;
-        r.info.updatesAvailable = updatesAvailable;
-        r.info.updatesLastCheck = new Date(updatesLastCheck).toISOString();
+        systemUpdatesLastCheck = Date.now();
+        systemUpdatesAvailable = updates;
+        r.info.systemUpdatesAvailable = systemUpdatesAvailable;
+        r.info.systemUpdatesLastCheck = new Date(
+          systemUpdatesLastCheck
+        ).toISOString();
       })
       .catch((e) => {
         log(3, sn, "System updates errored:");
         log(3, sn, Error("Error checking for system updates:", { cause: e }));
       });
   }
+  */
 
   log(0, sn, "Publishing system state:", JSON.stringify(r));
 
@@ -314,30 +336,23 @@ async function checkForSystemUpdates() {
   });
 }
 
-function subscribeToMessages() {
-  client.subscribe(`${BASE_TOPIC}/update`);
-  client.subscribe(`${BASE_TOPIC}/upgradesystem`);
-}
+function subscribeToMessages() {}
 
 client.on("message", (topic, message) => {
   log(0, sn, "Received MQTT Message on topic", topic, ": ", message.toString());
 
   switch (topic) {
-    case `${BASE_TOPIC}/update`:
+    case COMMAND_TOPIC_UPDATE:
       log(1, sn, "Manual update requested via MQTT");
       sendSystemState().catch((e) => {
         log(3, sn, Error("Error sending system state:", { cause: e }));
       });
       break;
 
-    case `${BASE_TOPIC}/upgradesystem`:
+    case COMMAND_TOPIC_UPDATE_FIRMWARE:
       log(1, sn, "System upgrade requested via MQTT");
       process.exit(1);
       break;
-  }
-  if (topic === `${BASE_TOPIC}/update`) {
-    log(1, sn, "Manual update requested via MQTT");
-    sendSystemState();
   }
 });
 
@@ -352,11 +367,12 @@ function publishDiscovery() {
         : {}),
       state_topic: MONITOR_TOPIC,
       availability_topic: STATUS_TOPIC,
-      payload_available: "ON",
-      payload_not_available: "OFF",
-      unique_id: `${PI_ID}_${name}`,
+      payload_available: PAYLOAD_STATUS_ON,
+      payload_not_available: PAYLOAD_STATUS_OFF,
+      unique_id: `${PI_ID_SYSTEM}_${name}`,
+      display_precision: 2,
       device: {
-        identifiers: [PI_ID],
+        identifiers: [PI_ID_SYSTEM],
         name: PI_NAME_FRIENDLY,
         model: "Raspberry Pi",
         manufacturer: "Raspberry Pi Foundation",
@@ -364,10 +380,52 @@ function publishDiscovery() {
     };
 
     client.publish(
-      `${HA_DISCOVERY}/sensor/${PI_ID}_system/${name}/config`,
+      `${HA_DISCOVERY}/sensor/${PI_ID_SYSTEM}/${name}/config`,
       JSON.stringify(payload),
       { retain: true }
     );
+  });
+
+  Object.entries({
+    send_monitor_update: {
+      name: "Send Monitor Update",
+      command_topic: COMMAND_TOPIC_UPDATE,
+      discovery_type: "button",
+    },
+    update_ha_mqtt_software: {
+      name: "Update HA-MQTT Software",
+      command_topic: COMMAND_TOPIC_UPDATE_FIRMWARE,
+      // state_topic: MONITOR_TOPIC,
+      // value_template: "{{ value_json.info.softwareVersion }}",
+      // platform: "update",
+      // discovery_type: "update",
+      // release_url: repository?.url,
+      discovery_type: "button",
+    },
+  }).forEach(([name, cfg]) => {
+    const payload = {
+      ...filterByKeys(cfg, undefined, ["discovery_type"]),
+      availability_topic: STATUS_TOPIC,
+      payload_available: PAYLOAD_STATUS_ON,
+      payload_not_available: PAYLOAD_STATUS_OFF,
+      unique_id: `${PI_ID_SYSTEM}_${name}`,
+      device: {
+        identifiers: [PI_ID_SYSTEM],
+        name: PI_NAME_FRIENDLY,
+        model: "Raspberry Pi",
+        manufacturer: "Raspberry Pi Foundation",
+      },
+    };
+
+    client.publish(
+      `${HA_DISCOVERY}/${
+        cfg.discovery_type ?? "button"
+      }/${PI_ID_SYSTEM}/${name}/config`,
+      JSON.stringify(payload),
+      { retain: false }
+    );
+
+    client.subscribe(cfg.command_topic);
   });
 }
 

@@ -105,6 +105,9 @@ module.exports = async (calledScript) => {
   console.log("Updates complete, attempting to start script...");
 
   switch (calledScript) {
+    case "":
+      break;
+
     case "io":
       require("./js/indexIO.js");
       break;
