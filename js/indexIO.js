@@ -22,7 +22,7 @@ if (fs_1.default.existsSync((0, oberknecht_utils_1.mainPath)("./settings.js"))) 
     }
 }
 const { inputs, outputs } = settings;
-const { MQTT_BROKER, MQTT_USER, MQTT_PASS, HA_DISCOVERY, PI_ID, PI_NAME_FRIENDLY, UPDATE_INTERVAL_MS, BASE_TOPIC: BASE_TOPIC_ENV, STATUS_TOPIC: STATUS_TOPIC_ENV, PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV, PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV, PAYLOAD_GPIO_ON: PAYLOAD_GPIO_ON_ENV, PAYLOAD_GPIO_OFF: PAYLOAD_GPIO_OFF_ENV, } = dotenv_1.default.config().parsed || {};
+const { MQTT_BROKER, MQTT_USER, MQTT_PASS, HA_DISCOVERY, PI_ID, PI_NAME_FRIENDLY, UPDATE_INTERVAL_MS, BASE_TOPIC: BASE_TOPIC_ENV, STATUS_TOPIC: STATUS_TOPIC_ENV, PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV, PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV, PAYLOAD_GPIO_ON: PAYLOAD_GPIO_ON_ENV, PAYLOAD_GPIO_OFF: PAYLOAD_GPIO_OFF_ENV, } = dotenv_1.default.config({ quiet: true }).parsed || {};
 const gpio = new oberknecht_rpio_1.oberknechtRPIO();
 gpio.init();
 // ================= CONFIG =================
@@ -32,7 +32,9 @@ const PAYLOAD_STATUS_ON = PAYLOAD_STATUS_ON_ENV ?? "ON";
 const PAYLOAD_STATUS_OFF = PAYLOAD_STATUS_OFF_ENV ?? "OFF";
 const PAYLOAD_GPIO_ON = PAYLOAD_GPIO_ON_ENV ?? "1";
 const PAYLOAD_GPIO_OFF = PAYLOAD_GPIO_OFF_ENV ?? "0";
-const UPDATE_INTERVAL = UPDATE_INTERVAL_MS ? parseInt(UPDATE_INTERVAL_MS) : 60 * 1000;
+const UPDATE_INTERVAL = UPDATE_INTERVAL_MS
+    ? parseInt(UPDATE_INTERVAL_MS)
+    : 60 * 1000;
 // =========================================
 // MQTT connection
 const client = mqtt_1.default.connect(MQTT_BROKER, {
@@ -132,9 +134,9 @@ client.on("message", (topic, message) => {
 });
 // ================= HOME ASSISTANT DISCOVERY =================
 function publishDiscovery() {
-    console.log("Publishing Home Assistant MQTT Discovery");
+    (0, oberknecht_utils_1.log)(0, sn, "Publishing Home Assistant MQTT Discovery");
     // Inputs
-    Object.entries(inputs).forEach(([name, cfg]) => {
+    Object.entries(inputs ?? {}).forEach(([name, cfg]) => {
         const payload = {
             name: cfg?.nameFriendly ?? `${PI_ID} ${name}`,
             state_topic: `${BASE_TOPIC}/input/${name}/state`,
@@ -152,7 +154,7 @@ function publishDiscovery() {
         client.publish(`${HA_DISCOVERY}/binary_sensor/${PI_ID}/${name}/config`, JSON.stringify(payload), { retain: true });
     });
     // Outputs
-    Object.entries(outputs).forEach(([name, cfg]) => {
+    Object.entries(outputs ?? {}).forEach(([name, cfg]) => {
         const payload = {
             name: cfg?.nameFriendly ?? `${PI_ID} ${name}`,
             command_topic: `${BASE_TOPIC}/output/${name}/set`,
@@ -169,7 +171,7 @@ function publishDiscovery() {
 }
 // ================= CLEAN EXIT =================
 process.on("SIGINT", () => {
-    Object.values(inputs).forEach((pin) => {
+    Object.values(inputs ?? {}).forEach((pin) => {
         gpio.unMock(pin.pin, () => { });
     });
     process.exit();

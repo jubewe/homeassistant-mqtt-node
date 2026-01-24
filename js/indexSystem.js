@@ -10,7 +10,7 @@ const oberknecht_utils_1 = require("oberknecht-utils");
 const systeminformation_1 = __importDefault(require("systeminformation"));
 const child_process_1 = require("child_process");
 const sn = (0, oberknecht_utils_1.stackName)("HA-MQTT SystemMonitor")[0];
-const { MQTT_BROKER, MQTT_USER, MQTT_PASS, HA_DISCOVERY, PI_ID, PI_NAME_FRIENDLY, UPDATE_INTERVAL_MS, BASE_TOPIC_SYSTEM: BASE_TOPIC_ENV, STATUS_TOPIC_SYSTEM: STATUS_TOPIC_ENV, PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV, PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV, MONITOR_TOPIC_SYSTEM: MONITOR_TOPIC_ENV, } = dotenv_1.default.config().parsed || {};
+const { MQTT_BROKER, MQTT_USER, MQTT_PASS, HA_DISCOVERY, PI_ID, PI_NAME_FRIENDLY, UPDATE_INTERVAL_MS, BASE_TOPIC_SYSTEM: BASE_TOPIC_ENV, STATUS_TOPIC_SYSTEM: STATUS_TOPIC_ENV, PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV, PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV, MONITOR_TOPIC_SYSTEM: MONITOR_TOPIC_ENV, } = dotenv_1.default.config({ quiet: true }).parsed || {};
 // ================= CONFIG =================
 const BASE_TOPIC = BASE_TOPIC_ENV ?? `pis/system/${PI_ID}`;
 const STATUS_TOPIC = STATUS_TOPIC_ENV ?? `${BASE_TOPIC}/status`;
@@ -168,7 +168,7 @@ async function sendSystemState() {
     let r = {
         info: {
             timestamp: new Date().toISOString(),
-            startTime: new Date((Date.now() - systeminformation_1.default.time().uptime * 1000).toFixed(0)).toISOString(),
+            startTime: new Date(parseInt((Date.now() - systeminformation_1.default.time().uptime * 1000).toFixed(0))).toISOString(),
             cpuSpeed: -1,
             cpuUse: -1,
             temperature: -1,

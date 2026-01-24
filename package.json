@@ -1,6 +1,6 @@
 {
   "name": "test",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,6 +16,7 @@
     "oberknecht-rpio": "^0.1.6",
     "oberknecht-utils": "^2.0.4",
     "pm2": "^6.0.14",
+    "simple-git": "^3.30.0",
     "systeminformation": "^5.30.5"
   },
   "devDependencies": {

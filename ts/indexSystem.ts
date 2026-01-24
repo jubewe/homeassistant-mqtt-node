@@ -1,6 +1,5 @@
 import mqtt from "mqtt";
 import dotenv from "dotenv";
-import fs from "fs";
 import pm2 from "pm2";
 import { log, stackName } from "oberknecht-utils";
 import si from "systeminformation";
@@ -21,7 +20,7 @@ const {
   PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV,
   PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV,
   MONITOR_TOPIC_SYSTEM: MONITOR_TOPIC_ENV,
-} = dotenv.config().parsed || {};
+} = dotenv.config({ quiet: true }).parsed || {};
 
 // ================= CONFIG =================
 
@@ -193,7 +192,7 @@ async function sendSystemState() {
     info: {
       timestamp: new Date().toISOString(),
       startTime: new Date(
-        (Date.now() - si.time().uptime * 1000).toFixed(0)
+        parseInt((Date.now() - si.time().uptime * 1000).toFixed(0))
       ).toISOString(),
       cpuSpeed: -1,
       cpuUse: -1,
