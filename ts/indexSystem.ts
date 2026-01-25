@@ -4,6 +4,7 @@ import pm2 from "pm2";
 import { filterByKeys, log, stackName } from "oberknecht-utils";
 import si from "systeminformation";
 import { exec } from "child_process";
+import { systemSensorType } from "./types";
 
 const { version, repository } = require("../package.json");
 
@@ -43,7 +44,7 @@ const UPDATE_INTERVAL = UPDATE_INTERVAL_MS
   ? parseInt(UPDATE_INTERVAL_MS)
   : 60 * 1000;
 
-const systemSensors = {
+const systemSensors: Record<string, systemSensorType> = {
   last_updated: {
     name: "Last Updated",
     device_class: "timestamp",
@@ -368,7 +369,7 @@ function publishDiscovery() {
       payload_available: PAYLOAD_STATUS_ON,
       payload_not_available: PAYLOAD_STATUS_OFF,
       unique_id: `${PI_ID_SYSTEM}_${name}`,
-      suggested_display_precision: 2,
+      ...(cfg.unit_of_measurement ? { suggested_display_precision: 2 } : {}),
       device: {
         identifiers: [PI_ID_SYSTEM],
         name: PI_NAME_FRIENDLY,
