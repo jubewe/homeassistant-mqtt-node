@@ -287,7 +287,6 @@ async function sendSystemState() {
   r.info.networkRx = siDataNetwork[0].rx_bytes / 1024 / 1024; // in MB
   r.info.networkTx = siDataNetwork[0].tx_bytes / 1024 / 1024; // in MB
 
-  /*
   if (systemUpdatesLastCheck < Date.now() - 6 * 60 * 60 * 1000) {
     log(0, sn, "Checking for system updates...");
     await checkForSystemUpdates()
@@ -305,7 +304,6 @@ async function sendSystemState() {
         log(3, sn, Error("Error checking for system updates:", { cause: e }));
       });
   }
-  */
 
   log(0, sn, "Publishing system state:", JSON.stringify(r));
 

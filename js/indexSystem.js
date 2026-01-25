@@ -240,25 +240,21 @@ async function sendSystemState() {
     const siDataNetwork = await systeminformation_1.default.networkStats(await systeminformation_1.default.networkInterfaceDefault());
     r.info.networkRx = siDataNetwork[0].rx_bytes / 1024 / 1024; // in MB
     r.info.networkTx = siDataNetwork[0].tx_bytes / 1024 / 1024; // in MB
-    /*
     if (systemUpdatesLastCheck < Date.now() - 6 * 60 * 60 * 1000) {
-      log(0, sn, "Checking for system updates...");
-      await checkForSystemUpdates()
-        .then((updates: number) => {
-          log(0, sn, "System updates available:", updates);
-          systemUpdatesLastCheck = Date.now();
-          systemUpdatesAvailable = updates;
-          r.info.systemUpdatesAvailable = systemUpdatesAvailable;
-          r.info.systemUpdatesLastCheck = new Date(
-            systemUpdatesLastCheck
-          ).toISOString();
+        (0, oberknecht_utils_1.log)(0, sn, "Checking for system updates...");
+        await checkForSystemUpdates()
+            .then((updates) => {
+            (0, oberknecht_utils_1.log)(0, sn, "System updates available:", updates);
+            systemUpdatesLastCheck = Date.now();
+            systemUpdatesAvailable = updates;
+            r.info.systemUpdatesAvailable = systemUpdatesAvailable;
+            r.info.systemUpdatesLastCheck = new Date(systemUpdatesLastCheck).toISOString();
         })
-        .catch((e) => {
-          log(3, sn, "System updates errored:");
-          log(3, sn, Error("Error checking for system updates:", { cause: e }));
+            .catch((e) => {
+            (0, oberknecht_utils_1.log)(3, sn, "System updates errored:");
+            (0, oberknecht_utils_1.log)(3, sn, Error("Error checking for system updates:", { cause: e }));
         });
     }
-    */
     (0, oberknecht_utils_1.log)(0, sn, "Publishing system state:", JSON.stringify(r));
     client.publish(MONITOR_TOPIC, JSON.stringify(r));
 }
