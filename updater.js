@@ -3,7 +3,16 @@ module.exports = async (calledScript) => {
 
   console.log("Homeassistant MQTT updater called");
 
-  const logLevel = process.env["HA_MQTT_LOG_LEVEL"] || 0;
+  try {
+    const dotenv = require("dotenv");
+    dotenv.config({ quiet: true });
+  } catch (e) {
+    console.error("Could not load .env file:", e);
+  }
+
+  const logLevel = process.env["HA_MQTT_LOG_LEVEL"]
+    ? parseInt(process.env["HA_MQTT_LOG_LEVEL"])
+    : 1;
 
   if (logLevel >= 1) console.log("Installing npm packages...");
 
@@ -90,16 +99,17 @@ module.exports = async (calledScript) => {
                 JSON.stringify(update, null, 2)
               );
 
-            return resolve(1);
+            if (logLevel >= 1)
+              console.log("Restarting to apply GitHub updates...");
+            process.exit(1);
           });
         });
       });
     })
     .then((r) => {
-      if (r === 1) {
-        if (logLevel >= 1) console.log("Restarting to apply GitHub updates...");
-        process.exit(0);
-      }
+      // if (r === 2) {
+      //   process.exit(0);
+      // }
     });
 
   console.log("Updates complete, attempting to start script...");
