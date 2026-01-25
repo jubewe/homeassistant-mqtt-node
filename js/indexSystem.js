@@ -306,7 +306,7 @@ function publishDiscovery() {
             payload_available: PAYLOAD_STATUS_ON,
             payload_not_available: PAYLOAD_STATUS_OFF,
             unique_id: `${PI_ID_SYSTEM}_${name}`,
-            display_precision: 2,
+            suggested_display_precision: 2,
             device: {
                 identifiers: [PI_ID_SYSTEM],
                 name: PI_NAME_FRIENDLY,
