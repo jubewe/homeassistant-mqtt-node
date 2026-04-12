@@ -210,9 +210,9 @@ async function sendSystemState() {
             if (proc.pid === undefined)
                 return;
             pm2ActiveProcessCount++;
-            pm2UnstableRestarts += proc.pm2_env.unstable_restarts;
-            pm2MemoryUse += proc.monit.memory / 1024 / 1024 / 1024; // GB
-            pm2CPUUsage += proc.monit.cpu;
+            pm2UnstableRestarts += proc.pm2_env?.unstable_restarts ?? 0;
+            pm2MemoryUse += (proc.monit?.memory ?? 0) / 1024 / 1024 / 1024; // GB
+            pm2CPUUsage += proc.monit?.cpu ?? 0;
         });
         r.info.pm2ActiveProcessCount = pm2ActiveProcessCount;
         r.info.pm2UnstableRestarts = pm2UnstableRestarts;
@@ -255,7 +255,7 @@ async function sendSystemState() {
             (0, oberknecht_utils_1.log)(3, sn, Error("Error checking for system updates:", { cause: e }));
         });
     }
-    (0, oberknecht_utils_1.log)(0, sn, "Publishing system state:", JSON.stringify(r));
+    // log(0, sn, "Publishing system state:", JSON.stringify(r));
     client.publish(MONITOR_TOPIC, JSON.stringify(r));
 }
 async function checkForSystemUpdates() {

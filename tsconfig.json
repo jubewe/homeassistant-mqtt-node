@@ -3,9 +3,9 @@
         "./ts/"
     ],
     "compilerOptions": {
-        "rootDir": ".",
+        "rootDir": "./ts",
         "esModuleInterop": true,
-        "outDir": "./js",
+        "outDir": "./js/",
         "declaration": true,
         "module": "NodeNext",
         "target": "ESNext"
