@@ -1,6 +1,6 @@
 {
   "name": "test",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,7 +20,7 @@
     "oberknecht-utils": "^2.0.4",
     "pm2": "^6.0.14",
     "simple-git": "^3.30.0",
-    "systeminformation": "^5.30.5"
+    "systeminformation": "^5.31.5"
   },
   "devDependencies": {
     "@types/node": "^20.2.3",

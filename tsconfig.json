@@ -3,7 +3,7 @@
         "./ts/"
     ],
     "compilerOptions": {
-        "downlevelIteration": true,
+        "rootDir": ".",
         "esModuleInterop": true,
         "outDir": "./js",
         "declaration": true,

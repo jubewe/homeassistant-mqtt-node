@@ -246,9 +246,9 @@ async function sendSystemState() {
     processes.forEach((proc) => {
       if (proc.pid === undefined) return;
       pm2ActiveProcessCount++;
-      pm2UnstableRestarts += proc.pm2_env.unstable_restarts;
-      pm2MemoryUse += proc.monit.memory / 1024 / 1024 / 1024; // GB
-      pm2CPUUsage += proc.monit.cpu;
+      pm2UnstableRestarts += proc.pm2_env?.unstable_restarts ?? 0;
+      pm2MemoryUse += (proc.monit?.memory ?? 0) / 1024 / 1024 / 1024; // GB
+      pm2CPUUsage += proc.monit?.cpu ?? 0;
     });
 
     r.info.pm2ActiveProcessCount = pm2ActiveProcessCount;
@@ -257,7 +257,13 @@ async function sendSystemState() {
     r.info.pm2CPUUsage = parseFloat(pm2CPUUsage.toFixed(2));
   });
 
-  const siData = await si.get({
+  const siData: {
+    cpu: { speed: number };
+    cpuTemperature: { main: number };
+    currentLoad: { currentLoad: number };
+    fsSize: Array<{ use: number; used: number; mount: string }>;
+    mem: { active: number; total: number; used: number };
+  } = await si.get({
     cpu: "speed",
     cpuTemperature: "main",
     currentLoad: "currentLoad",
@@ -306,13 +312,13 @@ async function sendSystemState() {
       });
   }
 
-  log(0, sn, "Publishing system state:", JSON.stringify(r));
+  // log(0, sn, "Publishing system state:", JSON.stringify(r));
 
   client.publish(MONITOR_TOPIC, JSON.stringify(r));
 }
 
 async function checkForSystemUpdates() {
-  return new Promise((resolve, reject) => {
+  return new Promise<number>((resolve, reject) => {
     exec(
       "sudo apt-get update && sudo apt-get --just-print upgrade",
       (error, stdout, stderr) => {

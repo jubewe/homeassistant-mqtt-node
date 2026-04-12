@@ -156,7 +156,7 @@ function sendGPIOStates() {
 }
 
 // ================= GPIO OUTPUTS =================
-const outputGpios = {};
+const outputGpios: Record<string, { pin: string; cfg: any }> = {};
 
 Object.entries(outputs).forEach(([name, cfg]) => {
   outputGpios[name] = { pin: cfg.pin, cfg: cfg };
