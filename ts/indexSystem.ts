@@ -300,7 +300,7 @@ async function sendSystemState() {
       .then((updates: number) => {
         log(0, sn, "System updates available:", updates);
         systemUpdatesLastCheck = Date.now();
-        systemUpdatesAvailable = updates;
+        systemUpdatesAvailable = updates ?? 0;
         r.info.systemUpdatesAvailable = systemUpdatesAvailable;
         r.info.systemUpdatesLastCheck = new Date(
           systemUpdatesLastCheck
