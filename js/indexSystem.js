@@ -247,7 +247,7 @@ async function sendSystemState() {
             (0, oberknecht_utils_1.log)(0, sn, "System updates available:", updates);
             systemUpdatesLastCheck = Date.now();
             systemUpdatesAvailable = updates ?? 0;
-            r.info.systemUpdatesAvailable = systemUpdatesAvailable;
+            r.info.systemUpdatesAvailable = systemUpdatesAvailable ?? 0;
             r.info.systemUpdatesLastCheck = new Date(systemUpdatesLastCheck).toISOString();
         })
             .catch((e) => {
