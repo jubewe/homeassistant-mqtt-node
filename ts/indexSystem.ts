@@ -30,7 +30,7 @@ const {
 
 const PI_ID_SYSTEM = PI_ID_SYSTEM_ENV ?? `${PI_ID}_system`;
 
-const BASE_TOPIC = BASE_TOPIC_ENV ?? `pis/${PI_ID_SYSTEM}`;
+const BASE_TOPIC = BASE_TOPIC_ENV ?? `systems/${PI_ID_SYSTEM}`;
 const STATUS_TOPIC = STATUS_TOPIC_ENV ?? `${BASE_TOPIC}/status`;
 const PAYLOAD_STATUS_ON = PAYLOAD_STATUS_ON_ENV ?? "ON";
 const PAYLOAD_STATUS_OFF = PAYLOAD_STATUS_OFF_ENV ?? "OFF";
@@ -179,6 +179,8 @@ const client = mqtt.connect(MQTT_BROKER, {
     retain: true,
   },
 });
+
+log(1, sn, "Connecting to MQTT broker:", MQTT_BROKER);
 
 client.on("connect", () => {
   log(1, sn, "MQTT connected (System Monitoring)");

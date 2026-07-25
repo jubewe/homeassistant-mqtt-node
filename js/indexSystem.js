@@ -14,7 +14,7 @@ const sn = (0, oberknecht_utils_1.stackName)("HA-MQTT SystemMonitor")[0];
 const { MQTT_BROKER, MQTT_USER, MQTT_PASS, HA_DISCOVERY, PI_ID, PI_ID_SYSTEM: PI_ID_SYSTEM_ENV, PI_NAME_FRIENDLY, UPDATE_INTERVAL_MS, BASE_TOPIC_SYSTEM: BASE_TOPIC_ENV, STATUS_TOPIC_SYSTEM: STATUS_TOPIC_ENV, PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV, PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV, MONITOR_TOPIC_SYSTEM: MONITOR_TOPIC_ENV, } = dotenv_1.default.config({ quiet: true }).parsed || {};
 // ================= CONFIG =================
 const PI_ID_SYSTEM = PI_ID_SYSTEM_ENV ?? `${PI_ID}_system`;
-const BASE_TOPIC = BASE_TOPIC_ENV ?? `pis/${PI_ID_SYSTEM}`;
+const BASE_TOPIC = BASE_TOPIC_ENV ?? `systems/${PI_ID_SYSTEM}`;
 const STATUS_TOPIC = STATUS_TOPIC_ENV ?? `${BASE_TOPIC}/status`;
 const PAYLOAD_STATUS_ON = PAYLOAD_STATUS_ON_ENV ?? "ON";
 const PAYLOAD_STATUS_OFF = PAYLOAD_STATUS_OFF_ENV ?? "OFF";
@@ -156,6 +156,7 @@ const client = mqtt_1.default.connect(MQTT_BROKER, {
         retain: true,
     },
 });
+(0, oberknecht_utils_1.log)(1, sn, "Connecting to MQTT broker:", MQTT_BROKER);
 client.on("connect", () => {
     (0, oberknecht_utils_1.log)(1, sn, "MQTT connected (System Monitoring)");
     client.publish(STATUS_TOPIC, PAYLOAD_STATUS_ON, { retain: true });

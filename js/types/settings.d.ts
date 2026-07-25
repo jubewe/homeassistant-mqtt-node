@@ -1,16 +1,16 @@
-export declare type settingsInputType = {
+export type settingsInputType = {
     nameFriendly: string;
     pin: string;
     type: "binary_sensor";
     invertLogic?: boolean;
 };
-export declare type settingsOutputType = {
+export type settingsOutputType = {
     nameFriendly: string;
     pin: string;
     type: "switch";
     invertLogic?: boolean;
 };
-export declare type settingsType = {
+export type settingsType = {
     inputs: Record<string, settingsInputType>;
     outputs: Record<string, settingsOutputType>;
 };
