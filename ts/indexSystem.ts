@@ -24,6 +24,7 @@ const {
   PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV,
   PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV,
   MONITOR_TOPIC_SYSTEM: MONITOR_TOPIC_ENV,
+  HAS_SUDO,
 } = dotenv.config({ quiet: true }).parsed || {};
 
 // ================= CONFIG =================
@@ -322,7 +323,7 @@ async function sendSystemState() {
 async function checkForSystemUpdates() {
   return new Promise<number>((resolve, reject) => {
     exec(
-      "sudo apt-get update && sudo apt-get --just-print upgrade",
+      `${HAS_SUDO ? "sudo " : ""}apt-get update && ${HAS_SUDO ? "sudo " : ""}apt-get --just-print upgrade`,
       (error, stdout, stderr) => {
         if (error || stderr) {
           reject(error ?? stderr);
