@@ -110,12 +110,16 @@ module.exports = async (calledScript) => {
       // if (r === 2) {
       //   process.exit(0);
       // }
+    })
+    .catch((e) => {
+      console.error("Error during Git fetch/pull:", e);
     });
 
   console.log("Updates complete, attempting to start script...");
 
   switch (calledScript) {
     case "":
+      console.error("No script called, exiting...");
       break;
 
     case "io":
