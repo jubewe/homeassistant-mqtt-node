@@ -11,7 +11,7 @@ const systeminformation_1 = __importDefault(require("systeminformation"));
 const child_process_1 = require("child_process");
 const { version, repository } = require("../package.json");
 const sn = (0, oberknecht_utils_1.stackName)("HA-MQTT SystemMonitor")[0];
-const { MQTT_BROKER, MQTT_USER, MQTT_PASS, HA_DISCOVERY, PI_ID, PI_ID_SYSTEM: PI_ID_SYSTEM_ENV, PI_NAME_FRIENDLY, UPDATE_INTERVAL_MS, BASE_TOPIC_SYSTEM: BASE_TOPIC_ENV, STATUS_TOPIC_SYSTEM: STATUS_TOPIC_ENV, PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV, PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV, MONITOR_TOPIC_SYSTEM: MONITOR_TOPIC_ENV, HAS_SUDO, } = dotenv_1.default.config({ quiet: true }).parsed || {};
+const { MQTT_BROKER, MQTT_USER, MQTT_PASS, HA_DISCOVERY, PI_ID, PI_ID_SYSTEM: PI_ID_SYSTEM_ENV, PI_NAME_FRIENDLY, UPDATE_INTERVAL_MS, BASE_TOPIC_SYSTEM: BASE_TOPIC_ENV, STATUS_TOPIC_SYSTEM: STATUS_TOPIC_ENV, PAYLOAD_STATUS_ON: PAYLOAD_STATUS_ON_ENV, PAYLOAD_STATUS_OFF: PAYLOAD_STATUS_OFF_ENV, MONITOR_TOPIC_SYSTEM: MONITOR_TOPIC_ENV, HAS_SUDO, HAS_UNATTENDED_UPDATE, } = dotenv_1.default.config({ quiet: true }).parsed || {};
 // ================= CONFIG =================
 const PI_ID_SYSTEM = PI_ID_SYSTEM_ENV ?? `${PI_ID}_system`;
 const BASE_TOPIC = BASE_TOPIC_ENV ?? `systems/${PI_ID_SYSTEM}`;
@@ -261,7 +261,10 @@ async function sendSystemState() {
 }
 async function checkForSystemUpdates() {
     return new Promise((resolve, reject) => {
-        (0, child_process_1.exec)(`${HAS_SUDO ? "sudo " : ""}apt-get update && ${HAS_SUDO ? "sudo " : ""}apt-get --just-print upgrade`, (error, stdout, stderr) => {
+        (0, child_process_1.exec)((HAS_UNATTENDED_UPDATE
+            ? ""
+            : `${HAS_SUDO ? "sudo " : ""}apt-get update &&`) +
+            `${HAS_SUDO ? "sudo " : ""}apt-get --just-print upgrade`, (error, stdout, stderr) => {
             if (error || stderr) {
                 reject(error ?? stderr);
                 return;
